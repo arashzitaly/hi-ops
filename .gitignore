@@ -5,3 +5,5 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+AGENTS.md
+DECISIONS.md

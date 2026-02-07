@@ -94,27 +94,64 @@ reviewable.
 - Document the “why” behind each change in README.
 - Add a brief **Decisions & Trade-offs** note for each phase.
 
-## Phase 1 quickstart
+## Implemented status (through Phase 2)
+- Phase 1 completed:
+  - FastAPI app with `GET /`
+  - CI workflow with stable job names: `lint`, `format`, `test`
+  - Initial pytest coverage
+- Phase 2 completed:
+  - `GET /greet` with required query parameter `name`
+  - `GET /health` returning `{"status": "ok"}`
+  - Minimal request logging middleware (`method`, `path`, `status_code`)
+  - Tests for happy path and validation behavior (`422` on missing `name`)
+
+## Quickstart
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
 ```
 
 Run locally:
 ```bash
-uvicorn app.main:app --reload
+python3 -m uvicorn app.main:app --reload
 ```
 
 Quality checks:
 ```bash
-ruff check .
-ruff format --check .
-pytest -v
+python3 -m ruff check .
+python3 -m ruff format --check .
+python3 -m pytest -v
 ```
 
-Endpoint response:
+## API behavior (current)
+`GET /`:
 ```bash
 curl http://127.0.0.1:8000/
 # {"message":"Hello, World!"}
 ```
+
+`GET /greet?name=Arash`:
+```bash
+curl "http://127.0.0.1:8000/greet?name=Arash"
+# {"message":"Hello, Arash!"}
+```
+
+`GET /greet` (missing required query parameter):
+```bash
+curl "http://127.0.0.1:8000/greet"
+# HTTP 422 Unprocessable Entity
+```
+
+`GET /health`:
+```bash
+curl http://127.0.0.1:8000/health
+# {"status":"ok"}
+```
+
+## Tests currently in repo
+- `test_root_returns_hello_world`
+- `test_greet_happy_path`
+- `test_greet_missing_name_returns_422`
+- `test_health_returns_ok`
