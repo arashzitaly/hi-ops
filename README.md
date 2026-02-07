@@ -93,3 +93,28 @@ reviewable.
 - Use CI as a guardrail (lint + tests).
 - Document the “why” behind each change in README.
 - Add a brief **Decisions & Trade-offs** note for each phase.
+
+## Phase 1 quickstart
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Run locally:
+```bash
+uvicorn app.main:app --reload
+```
+
+Quality checks:
+```bash
+ruff check .
+ruff format --check .
+pytest -v
+```
+
+Endpoint response:
+```bash
+curl http://127.0.0.1:8000/
+# {"message":"Hello, World!"}
+```
