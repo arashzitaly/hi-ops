@@ -33,3 +33,35 @@
   - Assign one owner for `.github/workflows/ci.yml` changes per task.
   - Keep job names stable (`lint`, `format`, `test`) and treat them as API contracts for branch protection.
   - Require PR review for workflow changes and avoid parallel edits to the same workflow in separate PRs.
+
+## Phase 2 - API Parameters + Quality Gates
+
+### API endpoints and parameter handling
+- Decision: Add `GET /greet` with required query parameter `name` and add `GET /health` returning `{"status": "ok"}`.
+- Why: Introduces parameterized request handling and a basic health endpoint while keeping the API simple for incremental learning.
+- Alternative considered: Make `name` optional with a default response (for example, `"Hello, World!"`), but this would skip explicit validation behavior needed in this phase.
+- Deferred: Additional endpoints, request body models, and custom response schemas.
+
+### Validation strategy
+- Decision: Use FastAPI's built-in query validation for missing required parameters and accept the default `422` validation response.
+- Why: Keeps validation logic concise and consistent with framework defaults.
+- Alternative considered: Manual validation in endpoint logic with custom `400` responses.
+- Deferred: Custom exception handlers and standardized error payloads.
+
+### Request logging approach
+- Decision: Add minimal HTTP middleware logging (`method`, `path`, `status_code`) using Python's built-in `logging` module.
+- Why: Provides immediate request visibility with minimal complexity and no added dependencies.
+- Alternative considered: Add a structured logging dependency or rely only on server-level access logs.
+- Deferred: Correlation IDs, JSON logs, and environment-driven log configuration.
+
+### Test coverage for new behavior
+- Decision: Add tests for `/greet` happy path, `/greet` missing `name` (expect `422`), and `/health`.
+- Why: Keeps tests behavior-focused and aligns with the rule that each new behavior should be covered.
+- Alternative considered: Only testing happy paths, which would miss validation behavior.
+- Deferred: Dedicated contract tests and warning cleanup work outside core Phase 2 scope.
+
+### Dependencies added in Phase 2
+- Decision: Add no new dependencies.
+- Why: Existing stack (`fastapi`, `pytest`, `ruff`) already supports this phase's goals.
+- Alternative considered: Introduce additional logging or validation helper libraries.
+- Deferred: Re-evaluate dependencies only when Phase 3 introduces external API integration.
