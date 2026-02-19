@@ -55,7 +55,6 @@ jobs:
         run: pytest -v
   
   weather_smoke:
-    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: [test]
     env:
@@ -95,9 +94,6 @@ jobs:
           python - <<'PY'
           import json, os
           data = json.loads(os.environ["BODY"])
-          # TODO[3]: choose strictness:
-          # a) learning mode: weather OR weather_error
-          # b) strict mode: weather only
           if not ("weather" in data or "weather_error" in data):
               raise SystemExit(f"Missing weather/weather_error: {data}")
           print("OK")
