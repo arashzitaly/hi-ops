@@ -94,7 +94,7 @@ reviewable.
 - Document the “why” behind each change in README.
 - Add a brief **Decisions & Trade-offs** note for each phase.
 
-## Implemented status (through Phase 2)
+## Implemented status (through Phase 3)
 - Phase 1 completed:
   - FastAPI app with `GET /`
   - CI workflow with stable job names: `lint`, `format`, `test`
@@ -104,6 +104,12 @@ reviewable.
   - `GET /health` returning `{"status": "ok"}`
   - Minimal request logging middleware (`method`, `path`, `status_code`)
   - Tests for happy path and validation behavior (`422` on missing `name`)
+- Phase 3 completed:
+  - `GET /greet` now requires `name` and `surname`
+  - Optional query parameters: `phone`, `city`
+  - Weather lookup for `city` using an external API client with timeout/error handling
+  - Environment-variable-based weather client configuration
+  - Mocked tests for weather success and failure behavior
 
 ## Quickstart
 ```bash
@@ -112,6 +118,15 @@ source .venv/bin/activate
 python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
 ```
+
+Weather environment variables (optional for local testing; required for live weather calls):
+```bash
+cp .env.example .env
+export WEATHER_GEOCODING_BASE_URL="https://geocoding-api.open-meteo.com/v1/search"
+export WEATHER_FORECAST_BASE_URL="https://api.open-meteo.com/v1/forecast"
+export WEATHER_TIMEOUT_SECONDS="3.0"
+```
+This project now uses Open-Meteo public APIs (no API key required for non-commercial use).
 
 Run locally:
 ```bash
@@ -132,16 +147,28 @@ curl http://127.0.0.1:8000/
 # {"message":"Hello, World!"}
 ```
 
-`GET /greet?name=Arash`:
+`GET /greet?name=Arash&surname=Karimi`:
 ```bash
-curl "http://127.0.0.1:8000/greet?name=Arash"
-# {"message":"Hello, Arash!"}
+curl "http://127.0.0.1:8000/greet?name=Arash&surname=Karimi"
+# {"message":"Hello, Arash Karimi!"}
 ```
 
-`GET /greet` (missing required query parameter):
+`GET /greet?name=Arash&surname=Karimi&phone=555-0101`:
 ```bash
-curl "http://127.0.0.1:8000/greet"
-# HTTP 422 Unprocessable Entity
+curl "http://127.0.0.1:8000/greet?name=Arash&surname=Karimi&phone=555-0101"
+# {"message":"Hello, Arash Karimi!","phone":"555-0101"}
+```
+
+`GET /greet?name=Arash&surname=Karimi&city=Tehran`:
+```bash
+curl "http://127.0.0.1:8000/greet?name=Arash&surname=Karimi&city=Tehran"
+# {"message":"Hello, Arash Karimi!","city":"Tehran","weather":{"description":"...","temperature_c":...}}
+```
+
+`GET /greet` (missing required query parameters):
+```bash
+curl "http://127.0.0.1:8000/greet?name=Arash"
+# HTTP 422 Unprocessable Entity (missing `surname`)
 ```
 
 `GET /health`:
@@ -154,4 +181,11 @@ curl http://127.0.0.1:8000/health
 - `test_root_returns_hello_world`
 - `test_greet_happy_path`
 - `test_greet_missing_name_returns_422`
+- `test_greet_missing_surname_returns_422`
+- `test_greet_with_phone_returns_phone`
+- `test_greet_with_city_returns_weather`
+- `test_greet_with_city_handles_weather_failure`
 - `test_health_returns_ok`
+- `test_get_weather_returns_description_and_temperature`
+- `test_get_weather_city_not_found_raises_client_error`
+- `test_get_weather_timeout_raises_client_error`
