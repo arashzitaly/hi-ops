@@ -122,10 +122,11 @@ python3 -m pip install -r requirements.txt
 Weather environment variables (optional for local testing; required for live weather calls):
 ```bash
 cp .env.example .env
-export WEATHER_API_BASE_URL="https://api.openweathermap.org/data/2.5/weather"
-export WEATHER_API_KEY="replace-with-your-api-key"
+export WEATHER_GEOCODING_BASE_URL="https://geocoding-api.open-meteo.com/v1/search"
+export WEATHER_FORECAST_BASE_URL="https://api.open-meteo.com/v1/forecast"
 export WEATHER_TIMEOUT_SECONDS="3.0"
 ```
+This project now uses Open-Meteo public APIs (no API key required for non-commercial use).
 
 Run locally:
 ```bash
@@ -186,5 +187,5 @@ curl http://127.0.0.1:8000/health
 - `test_greet_with_city_handles_weather_failure`
 - `test_health_returns_ok`
 - `test_get_weather_returns_description_and_temperature`
-- `test_get_weather_requires_api_key`
+- `test_get_weather_city_not_found_raises_client_error`
 - `test_get_weather_timeout_raises_client_error`
