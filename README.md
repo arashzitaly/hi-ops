@@ -189,3 +189,5 @@ curl http://127.0.0.1:8000/health
 - `test_get_weather_returns_description_and_temperature`
 - `test_get_weather_city_not_found_raises_client_error`
 - `test_get_weather_timeout_raises_client_error`
+- `test_get_weather_http_status_raises_client_error`
+- `test_get_weather_malformed_forecast_raises_client_error`

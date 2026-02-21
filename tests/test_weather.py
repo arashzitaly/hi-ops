@@ -102,3 +102,69 @@ def test_get_weather_timeout_raises_client_error(monkeypatch) -> None:
 
     with pytest.raises(WeatherClientError, match="timed out"):
         client.get_weather("Tehran")
+
+
+def test_get_weather_http_status_raises_client_error(monkeypatch) -> None:
+    client = WeatherClient(
+        Settings(
+            weather_geocoding_base_url="https://geo.example/api",
+            weather_forecast_base_url="https://forecast.example/api",
+            weather_timeout_seconds=1.5,
+        ),
+    )
+
+    def fake_get(url: str, params: dict[str, object], timeout: float) -> httpx.Response:
+        assert url == "https://geo.example/api"
+        assert timeout == 1.5
+        request = httpx.Request("GET", url, params=params)
+        return httpx.Response(503, request=request, json={"error": "upstream down"})
+
+    monkeypatch.setattr("app.services.weather.httpx.get", fake_get)
+
+    with pytest.raises(WeatherClientError, match="status 503"):
+        client.get_weather("Tehran")
+
+
+def test_get_weather_malformed_forecast_raises_client_error(monkeypatch) -> None:
+    client = WeatherClient(
+        Settings(
+            weather_geocoding_base_url="https://geo.example/api",
+            weather_forecast_base_url="https://forecast.example/api",
+            weather_timeout_seconds=1.5,
+        ),
+    )
+
+    def fake_get(url: str, params: dict[str, object], timeout: float) -> httpx.Response:
+        assert timeout == 1.5
+        request = httpx.Request("GET", url, params=params)
+
+        if url == "https://geo.example/api":
+            return httpx.Response(
+                200,
+                request=request,
+                json={
+                    "results": [
+                        {
+                            "name": "Tehran",
+                            "latitude": 35.6892,
+                            "longitude": 51.389,
+                        },
+                    ],
+                },
+            )
+
+        assert url == "https://forecast.example/api"
+        return httpx.Response(
+            200,
+            request=request,
+            json={
+                "current": {
+                    "temperature_2m": 26.2,
+                },
+            },
+        )
+
+    monkeypatch.setattr("app.services.weather.httpx.get", fake_get)
+
+    with pytest.raises(WeatherClientError, match="unexpected response format"):
+        client.get_weather("Tehran")

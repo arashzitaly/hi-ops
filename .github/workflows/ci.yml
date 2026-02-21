@@ -59,8 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test]
     env:
-      WEATHER_API_BASE_URL: ${{ vars.WEATHER_API_BASE_URL || 'https://api.open-meteo.com/v1/forecast' }}
-      WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+      WEATHER_FORECAST_BASE_URL: ${{ vars.WEATHER_FORECAST_BASE_URL || 'https://api.open-meteo.com/v1/forecast' }}
       WEATHER_TIMEOUT_SECONDS: "3.0"
       PORT: "8000"
     steps:

@@ -14,20 +14,20 @@ here is the AGENTS.md I created my own
 
 ## 2) Current phase and scope boundaries
 
-**CURRENT PHASE:** Phase 1 — Minimal API + CI
+**CURRENT PHASE:** Phase 3 - Optional params + external API
 
 **What you can build right now:**
-- FastAPI app with one "Hello World" endpoint
-- One pytest test for the endpoint
-- GitHub Actions CI with lint/format/test jobs
-- Basic README documentation
+- FastAPI app with `GET /`, `GET /greet`, and `GET /health`
+- Required query params in `/greet`: `name`, `surname`
+- Optional query params in `/greet`: `phone`, `city`
+- Weather lookup for `city` via external API client with timeout/error handling
+- GitHub Actions CI with stable `lint`, `format`, `test` jobs
 
 **What you CANNOT build yet (even if I ask):**
-- Multiple endpoints (wait for Phase 2)
-- Query parameters or request validation (wait for Phase 2)
-- External API calls (wait for Phase 3)
 - Docker containers (wait for Phase 4)
-- Any infrastructure (wait for Phase 5+)
+- Any infrastructure/IaC (wait for Phase 5)
+- Kubernetes deployment resources (wait for Phase 6)
+- Observability stack (wait for Phase 7)
 
 **If I ask for something out of scope:** Politely remind me which phase it belongs to and suggest I explicitly request moving to that phase first.
 
@@ -175,7 +175,7 @@ hello_ops/
 ### Phase 3 — Optional params + external API
 
 **Files to create/modify:**
-- `app/config.py` — Load env vars (WEATHER_API_KEY, etc.)
+- `app/config.py` - Load env vars (weather API base URLs and timeout)
 - `app/services/weather.py` — Weather API client with timeout and error handling
 - `app/main.py` — Modify endpoint to accept name (required), surname (required), phone (optional), city (optional)
 - If city provided, call weather service
@@ -335,7 +335,7 @@ For each phase, consider these collaboration questions:
 
 **Phase 2:** "If two engineers add different endpoints with validation, how do we ensure consistent error handling?"
 
-**Phase 3:** "If the weather API key needs to rotate, how would we coordinate secret updates across environments?"
+**Phase 3:** "If weather provider endpoints or timeout policy change, how would we coordinate config updates across environments?"
 
 **Phase 4:** "If two teams build containers from the same base image, how do we handle base image updates?"
 
@@ -415,3 +415,4 @@ If all six checkboxes pass, the phase is complete.
 │ Phase incomplete until ALL boxes checked.                   │
 └─────────────────────────────────────────────────────────────┘
 ```
+
