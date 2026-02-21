@@ -1,4 +1,8 @@
 # hello_ops
+## Project wiki
+Wiki-style project representation:
+- `docs/wiki/Home.md`
+
 ## Project goal
 Build a small Python API and **learn DevOps step-by-step**: testing, CI/CD,
 containers, Terraform IaC, Kubernetes, autoscaling, and observability. The focus
